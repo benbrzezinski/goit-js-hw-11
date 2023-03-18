@@ -1,0 +1,31 @@
+@use '../utils' as *;
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 80px 15px 0;
+
+  @include max-width(1599px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include max-width(1099px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include max-width(629px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gallery__card {
+  box-shadow: 0px 0px 24px -14px rgba(66, 68, 90, 1);
+}
+
+.gallery__img {
+  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 3/2;
+  border-radius: var(--main-border-radius) var(--main-border-radius) 0 0;
+}

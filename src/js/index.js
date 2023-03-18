@@ -24,7 +24,7 @@ const fetchPhotos = async page => {
         q: searcherValue,
         image_type: 'photo',
         orientation: 'horizontal',
-        safesearch: false,
+        safesearch: true,
         per_page: 40,
         page,
       },
@@ -46,11 +46,14 @@ const getPhotos = async e => {
   console.log(totalHits);
 
   if (!arrayOfPhotos.length) {
+    gallery.innerHTML = '';
     return Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.',
       notifyOptions
     );
   }
+
+  Notify.success(`Hooray! We found ${totalHits} images.`, notifyOptions);
 
   gallery.innerHTML = '';
   renderPhotos(arrayOfPhotos);
@@ -76,23 +79,27 @@ function renderPhotos(arrayOfPhotos) {
                       class="gallery__img"
                       src="${webformatURL}" 
                       alt="${tags}" 
-                      loading="lazy" 
+                      loading="lazy"
                     />
                   </a>
-                  <div class="photo-info">
-                    <p class="photo-info__item">
-                        <b>Likes</b> ${likes}
-                    </p>
-                    <p class="photo-info__item">
-                        <b>Views</b> ${views}
-                    </p>
-                    <p class="photo-info__item">
-                        <b>Comments</b> ${comments}
-                    </p>
-                    <p class="photo-info__item">
-                        <b>Downloads</b> ${downloads}
-                    </p>
-                  </div>
+                  <ul class="photo-info">
+                    <li class="photo-info__item">
+                        <b class="photo-info__text">Likes</b>
+                        <p class="photo-info__text">${likes}</p>
+                    </li>
+                    <li class="photo-info__item">
+                        <b class="photo-info__text">Views</b>
+                        <p class="photo-info__text">${views}</p>
+                    </li>
+                    <li class="photo-info__item">
+                        <b class="photo-info__text">Comments</b>
+                        <p class="photo-info__text">${comments}</p>
+                    </li>
+                    <li class="photo-info__item">
+                        <b class="photo-info__text">Downloads</b>
+                        <p class="photo-info__text">${downloads}</p>
+                    </li>
+                  </ul>
                 </div>`;
       }
     )

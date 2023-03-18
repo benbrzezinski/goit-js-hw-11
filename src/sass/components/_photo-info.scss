@@ -1,0 +1,25 @@
+@use '../utils' as *;
+
+.photo-info {
+  display: flex;
+  justify-content: space-around;
+  border: 1px solid rgba(204, 190, 191, 0.5);
+  border-radius: 0 0 var(--main-border-radius) var(--main-border-radius);
+  padding: 15px;
+
+  @include max-width(699px) {
+    padding-inline: 5px;
+  }
+}
+
+.photo-info__item {
+  text-align: center;
+}
+
+.photo-info__text {
+  margin-top: 4px;
+
+  @include max-width(759px) {
+    font-size: 15px;
+  }
+}
