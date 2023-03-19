@@ -101,11 +101,11 @@ const getPhotos = async e => {
     );
   }
 
-  window.scrollTo(0, 0);
   Notify.success(`Hooray! We found ${numberOfPhotos} images.`, notifyOptions);
-
+  window.scrollTo(0, 0);
   gallery.innerHTML = '';
   renderPhotos(arrayOfPhotos);
+  window.addEventListener('scroll', checkEndOfPage);
 };
 
 searchForm.addEventListener('submit', getPhotos);
@@ -115,10 +115,15 @@ const getMorePhotos = async () => {
 
   const photos = await fetchPhotos(page);
   const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
-  const limitPages = numberOfPhotos / 40;
-  loading.classList.remove('show');
+  const limitPages = numberOfPhotos / perPage;
 
+  loading.classList.remove('show');
   renderPhotos(arrayOfPhotos);
+  console.log(page);
+  console.log(Math.ceil(limitPages));
+  if (page >= Math.ceil(limitPages)) {
+    window.removeEventListener('scroll', checkEndOfPage);
+  }
 };
 
 const showLoadingAndRenderPhotos = () => {
@@ -129,12 +134,10 @@ const showLoadingAndRenderPhotos = () => {
   }, 500);
 };
 
-const checkEndOfPage = () => {
+const checkEndOfPage = throttle(() => {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-  if (scrollTop + clientHeight >= scrollHeight) {
+  console.log(scrollTop);
+  if (scrollTop + clientHeight >= scrollHeight - 10) {
     showLoadingAndRenderPhotos();
   }
-};
-
-window.addEventListener('scroll', throttle(checkEndOfPage, THROTTLE_DELAY));
+}, THROTTLE_DELAY);
