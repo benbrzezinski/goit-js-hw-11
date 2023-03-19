@@ -3,3 +3,16 @@
     @content;
   }
 }
+
+@mixin animation-mixin($name) {
+  @keyframes #{$name} {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}

@@ -1,16 +1,19 @@
 import axios from 'axios';
+import throttle from 'lodash.throttle';
 import { Notify } from 'notiflix';
 
+const THROTTLE_DELAY = 300;
 const searchForm = document.querySelector('.search-form');
 const searcher = document.querySelector('.search-form__searcher');
-const searchFormBtn = document.querySelector('.search-form__btn');
 const gallery = document.querySelector('.gallery');
+const loading = document.querySelector('.loading');
 const notifyOptions = {
   position: 'center-top',
-  distance: '80px',
+  distance: '70px',
   timeout: 4000,
   pauseOnHover: false,
 };
+const perPage = 40;
 let page = 1;
 
 const fetchPhotos = async page => {
@@ -25,7 +28,7 @@ const fetchPhotos = async page => {
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
-        per_page: 40,
+        per_page: perPage,
         page,
       },
     });
@@ -36,32 +39,7 @@ const fetchPhotos = async page => {
   }
 };
 
-const getPhotos = async e => {
-  e.preventDefault();
-
-  const photos = await fetchPhotos(page);
-  const { total, totalHits, hits: arrayOfPhotos } = photos;
-  console.log(arrayOfPhotos);
-  console.log(total);
-  console.log(totalHits);
-
-  if (!arrayOfPhotos.length) {
-    gallery.innerHTML = '';
-    return Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.',
-      notifyOptions
-    );
-  }
-
-  Notify.success(`Hooray! We found ${totalHits} images.`, notifyOptions);
-
-  gallery.innerHTML = '';
-  renderPhotos(arrayOfPhotos);
-};
-
-searchForm.addEventListener('submit', getPhotos);
-
-function renderPhotos(arrayOfPhotos) {
+const renderPhotos = arrayOfPhotos => {
   const photoTags = arrayOfPhotos
     .map(
       ({
@@ -106,4 +84,57 @@ function renderPhotos(arrayOfPhotos) {
     .join('');
 
   gallery.insertAdjacentHTML('beforeend', photoTags);
-}
+};
+
+const getPhotos = async e => {
+  e.preventDefault();
+  page = 1;
+
+  const photos = await fetchPhotos(page);
+  const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
+
+  if (!arrayOfPhotos.length) {
+    gallery.innerHTML = '';
+    return Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.',
+      notifyOptions
+    );
+  }
+
+  window.scrollTo(0, 0);
+  Notify.success(`Hooray! We found ${numberOfPhotos} images.`, notifyOptions);
+
+  gallery.innerHTML = '';
+  renderPhotos(arrayOfPhotos);
+};
+
+searchForm.addEventListener('submit', getPhotos);
+
+const getMorePhotos = async () => {
+  page++;
+
+  const photos = await fetchPhotos(page);
+  const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
+  const limitPages = numberOfPhotos / 40;
+  loading.classList.remove('show');
+
+  renderPhotos(arrayOfPhotos);
+};
+
+const showLoadingAndRenderPhotos = () => {
+  loading.classList.add('show');
+
+  setTimeout(() => {
+    getMorePhotos();
+  }, 500);
+};
+
+const checkEndOfPage = () => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  if (scrollTop + clientHeight >= scrollHeight) {
+    showLoadingAndRenderPhotos();
+  }
+};
+
+window.addEventListener('scroll', throttle(checkEndOfPage, THROTTLE_DELAY));
