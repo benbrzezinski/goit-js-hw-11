@@ -110,7 +110,12 @@ const getPhotos = async e => {
     timeout: 3000,
   });
 
-  window.scrollTo(0, 0);
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'instant',
+  });
+
   gallery.innerHTML = '';
   renderPhotos(arrayOfPhotos);
   window.addEventListener('scroll', getPhotosAtTheEndOfPage);
