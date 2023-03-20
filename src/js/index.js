@@ -1,3 +1,5 @@
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import axios from 'axios';
 import throttle from 'lodash.throttle';
 import { Notify } from 'notiflix';
@@ -7,14 +9,15 @@ const searchForm = document.querySelector('.search-form');
 const searcher = document.querySelector('.search-form__searcher');
 const gallery = document.querySelector('.gallery');
 const loading = document.querySelector('.loading');
+const gallerySlider = new SimpleLightbox('.gallery__link');
 const notifyOptions = {
   position: 'center-top',
   distance: '70px',
-  timeout: 4000,
+  timeout: 4500,
   pauseOnHover: false,
 };
 const perPage = 40;
-let page = 1;
+let page;
 
 const fetchPhotos = async page => {
   const searcherValue = searcher.value.toLowerCase().trim();
@@ -84,6 +87,7 @@ const renderPhotos = arrayOfPhotos => {
     .join('');
 
   gallery.insertAdjacentHTML('beforeend', photoTags);
+  gallerySlider.refresh();
 };
 
 const getPhotos = async e => {
@@ -101,11 +105,15 @@ const getPhotos = async e => {
     );
   }
 
-  Notify.success(`Hooray! We found ${numberOfPhotos} images.`, notifyOptions);
+  Notify.success(`Hooray! We found ${numberOfPhotos} images.`, {
+    ...notifyOptions,
+    timeout: 3000,
+  });
+
   window.scrollTo(0, 0);
   gallery.innerHTML = '';
   renderPhotos(arrayOfPhotos);
-  window.addEventListener('scroll', checkEndOfPage);
+  window.addEventListener('scroll', getPhotosAtTheEndOfPage);
 };
 
 searchForm.addEventListener('submit', getPhotos);
@@ -119,14 +127,28 @@ const getMorePhotos = async () => {
 
   loading.classList.remove('show');
   renderPhotos(arrayOfPhotos);
-  console.log(page);
-  console.log(Math.ceil(limitPages));
+
+  if (limitPages <= 1) {
+    Notify.failure(
+      "We're sorry, but you've reached the end of search results.",
+      {
+        ...notifyOptions,
+        position: 'center-bottom',
+        distance: '50px',
+        timeout: 5000,
+      }
+    );
+
+    return window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+  }
+
   if (page >= Math.ceil(limitPages)) {
-    window.removeEventListener('scroll', checkEndOfPage);
+    window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+    window.addEventListener('scroll', checkEndOfLastPage);
   }
 };
 
-const showLoadingAndRenderPhotos = () => {
+const showLoading = () => {
   loading.classList.add('show');
 
   setTimeout(() => {
@@ -134,10 +156,28 @@ const showLoadingAndRenderPhotos = () => {
   }, 500);
 };
 
-const checkEndOfPage = throttle(() => {
+const getPhotosAtTheEndOfPage = throttle(() => {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  console.log(scrollTop);
-  if (scrollTop + clientHeight >= scrollHeight - 10) {
-    showLoadingAndRenderPhotos();
+
+  if (scrollTop + clientHeight >= scrollHeight - 5) {
+    showLoading();
+  }
+}, THROTTLE_DELAY);
+
+const checkEndOfLastPage = throttle(() => {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  if (scrollTop + clientHeight >= scrollHeight - 5) {
+    Notify.failure(
+      "We're sorry, but you've reached the end of search results.",
+      {
+        ...notifyOptions,
+        position: 'center-bottom',
+        distance: '50px',
+        timeout: 5000,
+      }
+    );
+
+    window.removeEventListener('scroll', checkEndOfLastPage);
   }
 }, THROTTLE_DELAY);
