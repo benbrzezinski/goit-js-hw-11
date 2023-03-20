@@ -8,8 +8,8 @@ const THROTTLE_DELAY = 300;
 const searchForm = document.querySelector('.search-form');
 const searcher = document.querySelector('.search-form__searcher');
 const gallery = document.querySelector('.gallery');
-const loading = document.querySelector('.loading');
 const gallerySlider = new SimpleLightbox('.gallery__link');
+const loading = document.querySelector('.loading');
 const notifyOptions = {
   position: 'center-top',
   distance: '70px',
