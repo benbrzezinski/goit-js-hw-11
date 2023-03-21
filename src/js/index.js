@@ -5,6 +5,7 @@ import throttle from 'lodash.throttle';
 import { Notify } from 'notiflix';
 
 const THROTTLE_DELAY = 300;
+const THROTTLE_OPTIONS = { leading: false, trailing: true };
 const searchForm = document.querySelector('.search-form');
 const searcher = document.querySelector('.search-form__searcher');
 const gallery = document.querySelector('.gallery');
@@ -161,30 +162,38 @@ const showLoading = () => {
   }, 500);
 };
 
-const getPhotosAtTheEndOfPage = throttle(() => {
-  const endOfPage =
-    window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
+const getPhotosAtTheEndOfPage = throttle(
+  () => {
+    const endOfPage =
+      window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
+    console.log('1', endOfPage);
+    if (endOfPage) {
+      showLoading();
+    }
+  },
+  THROTTLE_DELAY,
+  THROTTLE_OPTIONS
+);
 
-  if (endOfPage) {
-    showLoading();
-  }
-}, THROTTLE_DELAY);
+const checkEndOfLastPage = throttle(
+  () => {
+    const endOfPage =
+      window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
+    console.log('2', endOfPage);
+    if (endOfPage) {
+      Notify.failure(
+        "We're sorry, but you've reached the end of search results.",
+        {
+          ...notifyOptions,
+          position: 'center-bottom',
+          distance: '50px',
+          timeout: 5000,
+        }
+      );
 
-const checkEndOfLastPage = throttle(() => {
-  const endOfPage =
-    window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
-
-  if (endOfPage) {
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results.",
-      {
-        ...notifyOptions,
-        position: 'center-bottom',
-        distance: '50px',
-        timeout: 5000,
-      }
-    );
-
-    window.removeEventListener('scroll', checkEndOfLastPage);
-  }
-}, THROTTLE_DELAY);
+      window.removeEventListener('scroll', checkEndOfLastPage);
+    }
+  },
+  THROTTLE_DELAY,
+  THROTTLE_OPTIONS
+);
