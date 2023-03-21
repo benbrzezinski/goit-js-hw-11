@@ -162,17 +162,19 @@ const showLoading = () => {
 };
 
 const getPhotosAtTheEndOfPage = throttle(() => {
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+  const endOfPage =
+    window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
 
-  if (scrollTop + clientHeight >= scrollHeight - 5) {
+  if (endOfPage) {
     showLoading();
   }
 }, THROTTLE_DELAY);
 
 const checkEndOfLastPage = throttle(() => {
-  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+  const endOfPage =
+    window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
 
-  if (scrollTop + clientHeight >= scrollHeight - 5) {
+  if (endOfPage) {
     Notify.failure(
       "We're sorry, but you've reached the end of search results.",
       {
