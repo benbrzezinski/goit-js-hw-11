@@ -165,8 +165,8 @@ const showLoading = () => {
 const getPhotosAtTheEndOfPage = throttle(
   () => {
     const endOfPage =
-      window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
-    console.log('1', endOfPage);
+      window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 5;
+
     if (endOfPage) {
       showLoading();
     }
@@ -178,8 +178,8 @@ const getPhotosAtTheEndOfPage = throttle(
 const checkEndOfLastPage = throttle(
   () => {
     const endOfPage =
-      window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
-    console.log('2', endOfPage);
+      window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 5;
+
     if (endOfPage) {
       Notify.failure(
         "We're sorry, but you've reached the end of search results.",
