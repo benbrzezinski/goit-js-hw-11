@@ -165,7 +165,7 @@ const showLoading = () => {
 const getPhotosAtTheEndOfPage = throttle(
   () => {
     const endOfPage =
-      window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 5;
+      window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 1;
 
     if (endOfPage) {
       showLoading();
@@ -178,7 +178,7 @@ const getPhotosAtTheEndOfPage = throttle(
 const checkEndOfLastPage = throttle(
   () => {
     const endOfPage =
-      window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 5;
+      window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 1;
 
     if (endOfPage) {
       Notify.failure(
