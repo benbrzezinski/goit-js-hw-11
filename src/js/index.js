@@ -99,6 +99,8 @@ const getPhotos = async e => {
   const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
 
   if (!arrayOfPhotos.length) {
+    window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+    window.removeEventListener('scroll', checkEndOfLastPage);
     gallery.innerHTML = '';
     return Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.',
@@ -117,12 +119,23 @@ const getPhotos = async e => {
     behavior: 'instant',
   });
 
+  window.removeEventListener('scroll', checkEndOfLastPage);
   gallery.innerHTML = '';
   renderPhotos(arrayOfPhotos);
   window.addEventListener('scroll', getPhotosAtTheEndOfPage);
 };
 
 searchForm.addEventListener('submit', getPhotos);
+
+const scrollDownAfterLoading = () => {
+  const { height: cardHeight } =
+    gallery.firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+};
 
 const getMorePhotos = async () => {
   page++;
@@ -147,6 +160,8 @@ const getMorePhotos = async () => {
 
     return window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
   }
+
+  scrollDownAfterLoading();
 
   if (page >= Math.ceil(limitPages)) {
     window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
