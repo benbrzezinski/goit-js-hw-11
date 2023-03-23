@@ -37,6 +37,7 @@ const getPhotos = async e => {
     window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
     window.removeEventListener('scroll', checkEndOfLastPage);
     gallery.innerHTML = '';
+
     return Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.',
       notifyOptions
@@ -52,6 +53,7 @@ const getPhotos = async e => {
 
   window.removeEventListener('scroll', checkEndOfLastPage);
   gallery.innerHTML = '';
+
   renderPhotos(arrayOfPhotos);
   window.addEventListener('scroll', getPhotosAtTheEndOfPage);
 };
