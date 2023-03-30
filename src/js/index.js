@@ -27,63 +27,71 @@ const notifyOptionsEndOfResults = {
 };
 
 const getPhotos = async e => {
-  e.preventDefault();
-  page = 1;
+  try {
+    e.preventDefault();
+    page = 1;
 
-  const photos = await fetchPhotos(perPage, page);
-  const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
+    const photos = await fetchPhotos(perPage, page);
+    const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
 
-  if (!arrayOfPhotos.length) {
-    window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+    if (!arrayOfPhotos.length) {
+      window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+      window.removeEventListener('scroll', checkEndOfLastPage);
+      gallery.innerHTML = '';
+
+      return Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.',
+        notifyOptions
+      );
+    }
+
+    Notify.success(`Hooray! We found ${numberOfPhotos} images.`, notifyOptions);
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant',
+    });
+
     window.removeEventListener('scroll', checkEndOfLastPage);
     gallery.innerHTML = '';
 
-    return Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.',
-      notifyOptions
-    );
+    renderPhotos(arrayOfPhotos);
+    window.addEventListener('scroll', getPhotosAtTheEndOfPage);
+  } catch (error) {
+    console.error(error.stack);
   }
-
-  Notify.success(`Hooray! We found ${numberOfPhotos} images.`, notifyOptions);
-
-  window.scrollTo({
-    top: 0,
-    behavior: 'instant',
-  });
-
-  window.removeEventListener('scroll', checkEndOfLastPage);
-  gallery.innerHTML = '';
-
-  renderPhotos(arrayOfPhotos);
-  window.addEventListener('scroll', getPhotosAtTheEndOfPage);
 };
 
 searchForm.addEventListener('submit', getPhotos);
 
 const getMorePhotos = async () => {
-  page++;
+  try {
+    page++;
 
-  const photos = await fetchPhotos(perPage, page);
-  const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
-  const limitPages = numberOfPhotos / perPage;
+    const photos = await fetchPhotos(perPage, page);
+    const { totalHits: numberOfPhotos, hits: arrayOfPhotos } = photos;
+    const limitPages = numberOfPhotos / perPage;
 
-  loading.classList.remove('show');
-  renderPhotos(arrayOfPhotos);
+    loading.classList.remove('show');
+    renderPhotos(arrayOfPhotos);
 
-  if (limitPages <= 1) {
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results.",
-      notifyOptionsEndOfResults
-    );
+    if (limitPages <= 1) {
+      Notify.failure(
+        "We're sorry, but you've reached the end of search results.",
+        notifyOptionsEndOfResults
+      );
 
-    return window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
-  }
+      return window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+    }
 
-  scrollDownAfterLoading();
+    scrollDownAfterLoading();
 
-  if (page >= Math.ceil(limitPages)) {
-    window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
-    window.addEventListener('scroll', checkEndOfLastPage);
+    if (page >= Math.ceil(limitPages)) {
+      window.removeEventListener('scroll', getPhotosAtTheEndOfPage);
+      window.addEventListener('scroll', checkEndOfLastPage);
+    }
+  } catch (error) {
+    console.error(error.stack);
   }
 };
 
