@@ -8,7 +8,7 @@
   bottom: 36px;
   left: 50%;
   transform: translateX(-50%);
-  transition: opacity var(--transition-duration) var(--cubic-bezier);
+  transition: opacity 100ms var(--cubic-bezier);
 }
 
 .loading.show {
