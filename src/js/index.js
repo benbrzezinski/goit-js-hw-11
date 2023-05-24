@@ -100,7 +100,7 @@ const showLoading = () => {
 
   setTimeout(() => {
     getMorePhotos();
-  }, 1000);
+  }, 500);
 };
 
 const getPhotosAtTheEndOfPage = throttle(
